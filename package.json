@@ -4,19 +4,21 @@
   "description": "tdd with express",
   "main": "src/app.js",
   "scripts": {
-    "start": "nodemon index",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "jest": "jest --watchAll"
+    "start": "cross-env NODE_ENV=development nodemon index",
+    "test": "cross-env NODE_ENV=test jest --watch"
   },
   "author": "Sangil Yun",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.0.1",
+    "config": "^3.3.6",
     "express": "^4.17.1",
+    "express-validator": "^6.11.1",
     "sequelize": "^6.6.2",
     "sqlite3": "^5.0.2"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "jest": "^27.0.4",
     "nodemon": "^2.0.7",
     "supertest": "^6.1.3"
