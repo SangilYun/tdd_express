@@ -1,0 +1,10 @@
+{
+  "username_null": "Username cannot be null in another languages",
+  "username_size": "Must have min 4 and max 32 characters in another languages",
+  "email_null": "E-mail cannot be null in another languages",
+  "email_invalid": "E-mail is not valid in another languages",
+  "password_null": "Password cannot be null in another languages",
+  "password_size": "Password must be at least 6 characters in another languages",
+  "password_pattern": "Password must have at least 1 uppercase, 1 lowercase letter and 1 number in another languages",
+  "email_inuse": "E-mail in use in other languages"
+}
