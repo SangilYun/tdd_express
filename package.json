@@ -24,8 +24,15 @@
   "devDependencies": {
     "cross-env": "^7.0.3",
     "jest": "^27.0.4",
-    "nodemailer-stub": "^1.2.2",
+    "jest-watch-typeahead": "^0.6.4",
     "nodemon": "^2.0.7",
+    "smtp-server": "^3.9.0",
     "supertest": "^6.1.3"
+  },
+  "jest": {
+    "watchPlugins": [
+      "jest-watch-typeahead/filename",
+      "jest-watch-typeahead/testname"
+    ]
   }
 }
