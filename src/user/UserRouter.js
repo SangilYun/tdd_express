@@ -28,8 +28,12 @@ router.post('/api/1.0/users',
             errors.array().forEach((error) => (validationErrors[error.param] = req.t(error.msg)))
             return res.status(400).send({ validationErrors })
         }
-        await UserService.save(req.body)
-        return res.send({ message: 'User Created' })
+        try {
+            await UserService.save(req.body)
+            return res.send({ message: 'User Created' })
+        } catch (e) {
+            return res.status(502).send({ message: req.t(e.message) })
+        }
     })
 
 module.exports = router
