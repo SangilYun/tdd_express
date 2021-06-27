@@ -36,4 +36,14 @@ router.post('/api/1.0/users',
         }
     })
 
+router.post('/api/1.0/users/token/:token', async (req, res) => {
+    const token = req.params.token
+    try {
+        await UserService.activate(token)
+    } catch (e) {
+        return res.status(400).send({message: req.t(e.message)})
+    }
+    res.send({ message: req.t('account_activation_success') })
+})
+
 module.exports = router

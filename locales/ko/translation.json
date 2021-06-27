@@ -7,5 +7,7 @@
   "password_size": "Password must be at least 6 characters in another languages",
   "password_pattern": "Password must have at least 1 uppercase, 1 lowercase letter and 1 number in another languages",
   "email_inuse": "E-mail in use in other languages",
-  "email_failure": "E-mail failure in other languages"
+  "email_failure": "E-mail failure in other languages",
+  "account_activation_failure": "This account is either active or the token is invalid in other languages",
+  "account_activation_success": "Account is activated in other languages"
 }
