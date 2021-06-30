@@ -9,5 +9,6 @@
   "email_inuse": "E-mail in use",
   "email_failure": "E-mail failure",
   "account_activation_failure": "This account is either active or the token is invalid",
-  "account_activation_success": "Account is activated"
+  "account_activation_success": "Account is activated",
+  "validation_failure": "Validation Failure"
 }

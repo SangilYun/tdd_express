@@ -223,6 +223,14 @@ describe('User Registration', () => {
         const users = await User.findAll()
         expect(users.length).toBe(0)
     })
+    it('returns Validation Failure message in error response body when validation fails', async () => {
+        const response = await postUser({
+            username: null,
+            email: null,
+            password: 'P4ssword',
+        })
+        expect(response.body.message).toBe('Validation Failure')
+    })
 })
 
 describe('internationalization', () => {
@@ -236,6 +244,7 @@ describe('internationalization', () => {
     const password_pattern = 'Password must have at least 1 uppercase, 1 lowercase letter and 1 number in another languages'
     const email_inuse = 'E-mail in use in other languages'
     const email_failure = 'E-mail failure in other languages'
+    const validation_failure = 'Validation Failure in other language'
 
     it.each`
         field           | value                                   | expectedMessage
@@ -333,3 +342,10 @@ describe('Account activation', () => {
         expect(response.body.message).toBe(message)
     })
 })
+describe('Error Model', () => {
+    it('returns path, timestamp, message and validationErrors in response when validation failure', async () => {
+        const response = await postUser({ ...validUser, username: null })
+        const body = response.body
+        expect(Object.keys(body)).toEqual(['path', 'timestamp', 'path', 'message', 'validationErrors' ])
+    })
+});
