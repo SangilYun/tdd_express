@@ -346,6 +346,28 @@ describe('Error Model', () => {
     it('returns path, timestamp, message and validationErrors in response when validation failure', async () => {
         const response = await postUser({ ...validUser, username: null })
         const body = response.body
-        expect(Object.keys(body)).toEqual(['path', 'timestamp', 'path', 'message', 'validationErrors' ])
+        expect(Object.keys(body)).toEqual(['message', 'path', 'timeStamp', 'validationErrors' ])
+    })
+    it('returns path, timestamp and message in response when request fails other than validation error', async () => {
+        const token = 'this-token-does-not-exist'
+        const response = await request(app).post('/api/1.0/users/token/' + token).send()
+        expect(response.status).toBe(400)
+        const body = response.body
+        expect(Object.keys(body)).toEqual(['message', 'path', 'timeStamp'])
+    })
+    it('returns path in error body', async () => {
+        const token = 'this-token-does-not-exist'
+        const response = await request(app).post('/api/1.0/users/token/' + token).send()
+        const body = response.body
+        expect(body.path).toEqual('/api/1.0/users/token/' + token)
+    })
+    it('returns timestamp in milliseconds within 5 seconds value in error body', async () => {
+        const nowInMillis = new Date().getTime()
+        const fiveSecondsLater = nowInMillis + 5 * 1000
+        const token = 'this-token-does-not-exist'
+        const response = await request(app).post('/api/1.0/users/token/' + token).send()
+        const body = response.body
+        expect(body.timeStamp).toBeGreaterThan(nowInMillis)
+        expect(body.timeStamp).toBeLessThan(fiveSecondsLater)
     })
 });
