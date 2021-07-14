@@ -15,7 +15,7 @@ beforeEach(async() => {
 async function addUser() {
     const user = { username: 'user1', email: 'user1@mail.com', password: 'P4ssword', inactive: false }
     user.password = await bcyrpt.hash(user.password, 10)
-    await User.create(user)
+    return await User.create(user)
 }
 
 const postAuthentication = async (credentials) => {
@@ -27,5 +27,14 @@ describe('Authentication', () => {
         await addUser()
         const response = await postAuthentication({email: 'user1@mail.com', password:'P4ssword'})
         expect(response.status).toBe(200)
+    })
+
+    it('returns only user id and username when login success', async () => {
+        const user = await addUser()
+        const response = await postAuthentication({email: 'user1@mail.com', password:'P4ssword'})
+        expect(response.body.id).toBe(user.id)
+        expect(response.body.username).toBe(user.username)
+        expect(Object.keys(response.body)).toEqual(['id', 'username'])
+
     })
 });
