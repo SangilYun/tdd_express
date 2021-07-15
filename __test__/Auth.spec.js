@@ -12,8 +12,9 @@ beforeEach(async () => {
     await User.destroy({ truncate: true })
 })
 
-async function addUser() {
-    const user = { username: 'user1', email: 'user1@mail.com', password: 'P4ssword', inactive: false }
+const activeUser = { username: 'user1', email: 'user1@mail.com', password: 'P4ssword', inactive: false }
+
+async function addUser(user = { ...activeUser }) {
     user.password = await bcyrpt.hash(user.password, 10)
     return await User.create(user)
 }
@@ -70,4 +71,9 @@ describe('Authentication', () => {
         expect(response.status).toBe(401)
     })
 
+    it('returns 403 forbidden when logging in with an inactive account', async () => {
+        await addUser({ ...activeUser, inactive: true })
+        const response = await postAuthentication({ email: 'user1@mail.com', password: 'P4ssword' })
+        expect(response.status).toBe(403)
+    })
 });

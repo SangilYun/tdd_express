@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const UserService = require('../user/UserService')
 const AuthenticationException = require('./AuthenticationException')
+const ForbiddenException = require('./ForbiddenException')
 const bcrypt = require('bcrypt')
 
 router.post('/api/1.0/auth', async (req, res, next) => {
@@ -13,6 +14,9 @@ router.post('/api/1.0/auth', async (req, res, next) => {
     const match = await bcrypt.compare(password, user.password)
     if(!match){
         return next(new AuthenticationException())
+    }
+    if(user.inactive){
+        return next(new ForbiddenException())
     }
     res.send({
         id: user.id,
