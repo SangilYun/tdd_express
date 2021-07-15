@@ -118,8 +118,8 @@ describe('Get user', () => {
         const response = await getUser()
         const error = response.body
         expect(error.path).toBe('/api/1.0/users/5')
-        expect(error.timeStamp).toBeGreaterThan(nowInMillis)
-        expect(Object.keys(error)).toEqual([ 'message', 'path', 'timeStamp' ])
+        expect(error.timestamp).toBeGreaterThan(nowInMillis)
+        expect(Object.keys(error)).toEqual([ 'message', 'path', 'timestamp' ])
     })
     it('returns 200 when an active user exist', async () => {
         const user = await User.create({

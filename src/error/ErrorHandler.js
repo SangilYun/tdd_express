@@ -8,7 +8,7 @@ module.exports = (err, req, res, next) => {
     res.status(status).send({
         message: req.t(message),
         path:req.originalUrl,
-        timeStamp: new Date().getTime(),
+        timestamp: new Date().getTime(),
         validationErrors,
     })
 }
