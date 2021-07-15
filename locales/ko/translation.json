@@ -12,5 +12,6 @@
   "account_activation_success": "Account is activated in other languages",
   "validation_failure": "Validation Failure in other languages",
   "user_not_found": "User not found in other languages",
-  "authentication_failure": "Incorrect credentials in other languages"
+  "authentication_failure": "Incorrect credentials in other languages",
+  "inactive_authentication_failure": "Account is inactive in other languages"
 }
