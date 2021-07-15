@@ -98,4 +98,12 @@ describe('Authentication', () => {
         const response = await postAuthentication({ email: 'user1@mail.com', password: 'P4ssword' }, { language })
         expect(response.body.message).toBe(message)
     })
+    it('returns 401 when e-mail is not valid', async () => {
+        const response = await postAuthentication({ password: 'P4ssword' })
+        expect(response.status).toBe(401)
+    })
+    it('returns 401 when password is not valid', async () => {
+        const response = await postAuthentication({ email: 'user1@mail.com' })
+        expect(response.status).toBe(401)
+    })
 });
