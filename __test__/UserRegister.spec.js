@@ -3,6 +3,9 @@ const app = require('../src/app')
 const User = require('../src/user/User')
 const sequelize = require('../src/config/database')
 const SMTPServer = require('smtp-server').SMTPServer
+const en = require('../locales/en/translation.json')
+const ko = require('../locales/ko/translation.json')
+
 
 let lastMail, server
 let simulateSmtpFailure = false
@@ -30,9 +33,9 @@ beforeAll(async () => {
     await server.listen(8587, 'localhost')
     return sequelize.sync()
 })
-beforeEach(() => {
+beforeEach(async () => {
     simulateSmtpFailure = false;
-    return User.destroy({ truncate: true })
+    await User.destroy({ truncate: true })
 })
 
 afterAll(async () => {
@@ -62,7 +65,7 @@ describe('User Registration', () => {
 
     it('returns success message when signup request is valid', async () => {
         const response = await postUser()
-        expect(response.body.message).toBe('User Created')
+        expect(response.body.message).toBe(en.user_create_success)
 
     })
 
@@ -116,33 +119,23 @@ describe('User Registration', () => {
         expect(Object.keys(body.validationErrors)).toEqual([ 'username', 'email' ])
     })
 
-    const username_null = 'Username cannot be null'
-    const username_size = 'Must have min 4 and max 32 characters'
-    const email_null = 'E-mail cannot be null'
-    const email_invalid = 'E-mail is not valid'
-    const password_null = 'Password cannot be null'
-
-    const password_size = 'Password must be at least 6 characters'
-    const password_pattern = 'Password must have at least 1 uppercase, 1 lowercase letter and 1 number'
-    const email_inuse = 'E-mail in use'
-
     it.each`
     field           | value                                   | expectedMessage
-    ${ 'username' } | ${ null }                               | ${ username_null }
-    ${ 'username' } | ${ 'usr' }                              | ${ username_size }
-    ${ 'username' } | ${ 'a'.repeat(33) }              | ${ username_size }
-    ${ 'email' }    | ${ null }                               | ${ email_null }
-    ${ 'email' }    | ${ 'mail.com' }                         | ${ email_invalid }
-    ${ 'email' }    | ${ 'user@mail' }                        | ${ email_invalid }
-    ${ 'email' }    | ${ 'user@.com' }                        | ${ email_invalid }
-    ${ 'password' } | ${ null }                               | ${ password_null }
-    ${ 'password' } | ${ 'p4ssw' }                            | ${ password_size }
-    ${ 'password' } | ${ 'alllowercase' }                     | ${ password_pattern }
-    ${ 'password' } | ${ 'ALLUPPERCASE' }                     | ${ password_pattern }
-    ${ 'password' } | ${ '123456789' }                        | ${ password_pattern }
-    ${ 'password' } | ${ 'lowerandUPPER' }                    | ${ password_pattern }
-    ${ 'password' } | ${ 'lower4nd56789' }                    | ${ password_pattern }
-    ${ 'password' } | ${ 'UPPER234234' }                      | ${ password_pattern }
+    ${ 'username' } | ${ null }                               | ${ en.username_null }
+    ${ 'username' } | ${ 'usr' }                              | ${ en.username_size }
+    ${ 'username' } | ${ 'a'.repeat(33) }              | ${ en.username_size }
+    ${ 'email' }    | ${ null }                               | ${ en.email_null }
+    ${ 'email' }    | ${ 'mail.com' }                         | ${ en.email_invalid }
+    ${ 'email' }    | ${ 'user@mail' }                        | ${ en.email_invalid }
+    ${ 'email' }    | ${ 'user@.com' }                        | ${ en.email_invalid }
+    ${ 'password' } | ${ null }                               | ${ en.password_null }
+    ${ 'password' } | ${ 'p4ssw' }                            | ${ en.password_size }
+    ${ 'password' } | ${ 'alllowercase' }                     | ${ en.password_pattern }
+    ${ 'password' } | ${ 'ALLUPPERCASE' }                     | ${ en.password_pattern }
+    ${ 'password' } | ${ '123456789' }                        | ${ en.password_pattern }
+    ${ 'password' } | ${ 'lowerandUPPER' }                    | ${ en.password_pattern }
+    ${ 'password' } | ${ 'lower4nd56789' }                    | ${ en.password_pattern }
+    ${ 'password' } | ${ 'UPPER234234' }                      | ${ en.password_pattern }
     
     `('returns $expectedMessage when $field is $value', async ({ field, value, expectedMessage }) => {
         const user = {
@@ -156,10 +149,10 @@ describe('User Registration', () => {
         expect(body.validationErrors[field]).toBe(expectedMessage)
     })
 
-    it(`returns ${ email_inuse } in use when same email is already in use`, async () => {
+    it(`returns ${ en.email_inuse } in use when same email is already in use`, async () => {
         await User.create({ ...validUser })
         const response = await postUser()
-        expect(response.body.validationErrors.email).toBe(email_inuse)
+        expect(response.body.validationErrors.email).toBe(en.email_inuse)
     })
 
     it('returns errors for both username is null and email is in use', async () => {
@@ -214,7 +207,7 @@ describe('User Registration', () => {
     it('returns Email failure message when sending email fails', async () => {
         simulateSmtpFailure = true
         const response = await postUser()
-        expect(response.body.message).toBe('E-mail failure')
+        expect(response.body.message).toBe(en.email_failure)
     })
 
     it('does not save user to database if activation email fails', async () => {
@@ -229,40 +222,28 @@ describe('User Registration', () => {
             email: null,
             password: 'P4ssword',
         })
-        expect(response.body.message).toBe('Validation Failure')
+        expect(response.body.message).toBe(en.validation_failure)
     })
 })
 
 describe('internationalization', () => {
-    const username_null = 'Username cannot be null in another languages'
-    const username_size = 'Must have min 4 and max 32 characters in another languages'
-    const email_null = 'E-mail cannot be null in another languages'
-    const email_invalid = 'E-mail is not valid in another languages'
-    const password_null = 'Password cannot be null in another languages'
-
-    const password_size = 'Password must be at least 6 characters in another languages'
-    const password_pattern = 'Password must have at least 1 uppercase, 1 lowercase letter and 1 number in another languages'
-    const email_inuse = 'E-mail in use in other languages'
-    const email_failure = 'E-mail failure in other languages'
-    const validation_failure = 'Validation Failure in other language'
-
     it.each`
         field           | value                                   | expectedMessage
-        ${ 'username' } | ${ null }                               | ${ username_null }
-        ${ 'username' } | ${ 'usr' }                              | ${ username_size }
-        ${ 'username' } | ${ 'a'.repeat(33) }              | ${ username_size }
-        ${ 'email' }    | ${ null }                               | ${ email_null }
-        ${ 'email' }    | ${ 'mail.com' }                         | ${ email_invalid }
-        ${ 'email' }    | ${ 'user@mail' }                        | ${ email_invalid }
-        ${ 'email' }    | ${ 'user@.com' }                        | ${ email_invalid }
-        ${ 'password' } | ${ null }                               | ${ password_null }
-        ${ 'password' } | ${ 'p4ssw' }                            | ${ password_size }
-        ${ 'password' } | ${ 'alllowercase' }                     | ${ password_pattern }
-        ${ 'password' } | ${ 'ALLUPPERCASE' }                     | ${ password_pattern }
-        ${ 'password' } | ${ '123456789' }                        | ${ password_pattern }
-        ${ 'password' } | ${ 'lowerandUPPER' }                    | ${ password_pattern }
-        ${ 'password' } | ${ 'lower4nd56789' }                    | ${ password_pattern }
-        ${ 'password' } | ${ 'UPPER234234' }                      | ${ password_pattern }
+        ${ 'username' } | ${ null }                               | ${ ko.username_null }
+        ${ 'username' } | ${ 'usr' }                              | ${ ko.username_size }
+        ${ 'username' } | ${ 'a'.repeat(33) }              | ${ ko.username_size }
+        ${ 'email' }    | ${ null }                               | ${ ko.email_null }
+        ${ 'email' }    | ${ 'mail.com' }                         | ${ ko.email_invalid }
+        ${ 'email' }    | ${ 'user@mail' }                        | ${ ko.email_invalid }
+        ${ 'email' }    | ${ 'user@.com' }                        | ${ ko.email_invalid }
+        ${ 'password' } | ${ null }                               | ${ ko.password_null }
+        ${ 'password' } | ${ 'p4ssw' }                            | ${ ko.password_size }
+        ${ 'password' } | ${ 'alllowercase' }                     | ${ ko.password_pattern }
+        ${ 'password' } | ${ 'ALLUPPERCASE' }                     | ${ ko.password_pattern }
+        ${ 'password' } | ${ '123456789' }                        | ${ ko.password_pattern }
+        ${ 'password' } | ${ 'lowerandUPPER' }                    | ${ ko.password_pattern }
+        ${ 'password' } | ${ 'lower4nd56789' }                    | ${ ko.password_pattern }
+        ${ 'password' } | ${ 'UPPER234234' }                      | ${ ko.password_pattern }
         
         `('returns $expectedMessage when $field is $value when language is set in other languages', async ({ field, value, expectedMessage }) => {
         const user = {
@@ -276,16 +257,16 @@ describe('internationalization', () => {
         expect(body.validationErrors[field]).toBe(expectedMessage)
     })
 
-    it(`returns ${ email_inuse } in use when same email is already in use in other languages`, async () => {
+    it(`returns ${ ko.email_inuse } in use when same email is already in use in other languages`, async () => {
         await User.create({ ...validUser })
         const response = await postUser({ ...validUser }, { language: 'ko' })
-        expect(response.body.validationErrors.email).toBe(email_inuse)
+        expect(response.body.validationErrors.email).toBe(ko.email_inuse)
     })
 
-    it(`returns ${ email_failure } message when sending email fails and language is set as non-english language`, async () => {
+    it(`returns ${ ko.email_failure } message when sending email fails and language is set as non-english language`, async () => {
         simulateSmtpFailure = true
         const response = await postUser({ ...validUser }, { language: 'ko' })
-        expect(response.body.message).toBe(email_failure)
+        expect(response.body.message).toBe(ko.email_failure)
     })
 });
 
@@ -324,10 +305,10 @@ describe('Account activation', () => {
 
     it.each`
     language    | tokenStatus     | message
-    ${'ko'}     | ${'wrong'}      | ${'This account is either active or the token is invalid in other languages'}
-    ${'en'}     | ${'wrong'}      | ${'This account is either active or the token is invalid'}
-    ${'ko'}     | ${'correct'}    | ${'Account is activated in other languages'}
-    ${'en'}     | ${'correct'}    | ${'Account is activated'}
+    ${'ko'}     | ${'wrong'}      | ${ko.account_activation_failure}
+    ${'en'}     | ${'wrong'}      | ${en.account_activation_failure}
+    ${'ko'}     | ${'correct'}    | ${ko.account_activation_success}
+    ${'en'}     | ${'correct'}    | ${en.account_activation_success}
     `('returns $message when wrong token is $tokenStatus and language is $language', async ({language, tokenStatus, message}) => {
         await postUser()
         let token = 'this-token-does-not-exist'

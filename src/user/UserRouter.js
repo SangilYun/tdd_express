@@ -30,7 +30,7 @@ router.post('/api/1.0/users',
         }
         try {
             await UserService.save(req.body)
-            return res.send({ message: 'User Created' })
+            return res.send({ message: req.t('user_create_success') })
         } catch (e) {
             next(e)
         }

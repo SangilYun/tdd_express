@@ -3,6 +3,8 @@ const app = require('../src/app')
 const User = require('../src/user/User')
 const sequelize = require('../src/config/database')
 const bcyrpt = require('bcrypt')
+const en = require('../locales/en/translation.json')
+const ko = require('../locales/ko/translation.json')
 
 beforeAll(async () => {
     await sequelize.sync()
@@ -59,8 +61,8 @@ describe('Authentication', () => {
     })
     it.each`
     language | message
-    ${ 'ko' } | ${ 'Incorrect credentials in other languages' }
-    ${ 'en' } | ${ 'Incorrect credentials' }
+    ${ 'ko' } | ${ ko.authentication_failure }
+    ${ 'en' } | ${ en.authentication_failure }
     `('returns $message when authentication fails and language is set as $language', async ({ language, message }) => {
         const response = await postAuthentication({ email: 'user1@mail.com', password: 'P4ssword' }, { language })
         expect(response.body.message).toBe(message)
@@ -91,8 +93,8 @@ describe('Authentication', () => {
     })
     it.each`
     language | message
-    ${ 'ko' } | ${ 'Account is inactive in other languages' }
-    ${ 'en' } | ${ 'Account is inactive' }
+    ${ 'ko' } | ${ ko.inactive_authentication_failure }
+    ${ 'en' } | ${ en.inactive_authentication_failure }
     `('returns $message when authentication fails for inactive account and language is set as $language', async ({ language, message }) => {
         await addUser({ ...activeUser, inactive: true })
         const response = await postAuthentication({ email: 'user1@mail.com', password: 'P4ssword' }, { language })
