@@ -16,7 +16,7 @@ beforeEach(async () => {
 
 const activeUser = { username: 'user1', email: 'user1@mail.com', password: 'P4ssword', inactive: false }
 
-async function addUser(user = { ...activeUser }) {
+const addUser = async (user = { ...activeUser }) => {
     user.password = await bcyrpt.hash(user.password, 10)
     return await User.create(user)
 }
