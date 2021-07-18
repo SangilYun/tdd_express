@@ -1,9 +1,8 @@
 const request = require('supertest')
-const request = require('supertest')
 const app = require('../src/app')
 const User = require('../src/user/User')
 const sequelize = require('../src/config/database')
-const bcyrpt = require('bcrypt')
+const bcrypt = require('bcrypt')
 const en = require('../locales/en/translation.json')
 const ko = require('../locales/ko/translation.json')
 
@@ -34,7 +33,7 @@ const putUser = (id = 5, body = null, options = {}) => {
 const activeUser = { username: 'user1', email: 'user1@mail.com', password: 'P4ssword', inactive: false }
 
 const addUser = async (user = { ...activeUser }) => {
-    user.password = await bcyrpt.hash(user.password, 10)
+    user.password = await bcrypt.hash(user.password, 10)
     return await User.create(user)
 }
 
@@ -66,7 +65,7 @@ describe('User Update', () => {
         const response = await putUser(5, null, { auth: { email: 'user1@mail.com', password: 'password' } })
         expect(response.status).toBe(403)
     })
-    it('returns forbidden when update request is sent with correct credentials but for differen user', async () => {
+    it('returns forbidden when update request is sent with correct credentials but for different user', async () => {
         await addUser()
         const userToBeUpdated = await addUser({ ...activeUser, username: 'user2', email: 'user2@mail.com' })
         const response = await putUser(userToBeUpdated.id, null, { auth: { email: 'user1@mail.com', password: 'P4ssword' } })
@@ -76,5 +75,18 @@ describe('User Update', () => {
         const inactiveUser = await addUser({ ...activeUser, inactive: true })
         const response = await putUser(inactiveUser.id, null, { auth: { email: 'user1@mail.com', password: 'P4ssword' } })
         expect(response.status).toBe(403)
+    })
+    it('returns 200 ok when valid update request sent from authorised user', async () => {
+        const savedUser = await addUser()
+        const validUpdate = { username: 'user1-updated' }
+        const response = await putUser(savedUser.id, validUpdate, { auth: { email: savedUser.email, password: 'P4ssword' } })
+        expect(response.status).toBe(200)
+    })
+    it('updates username in database when valid update request is sent from authorised user', async () => {
+        const savedUser = await addUser()
+        const validUpdate = { username: 'user1-updated' }
+        await putUser(savedUser.id, validUpdate, { auth: { email: savedUser.email, password: 'P4ssword' } })
+        const userInDB = await User.findOne({ where: { id: savedUser.id }})
+        expect(userInDB.username).toBe(validUpdate.username)
     })
 });
