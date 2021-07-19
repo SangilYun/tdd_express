@@ -33,7 +33,7 @@ const findByEmail = async (email) => {
 
 const activate = async token => {
     const user = await User.findOne({ where: { activationToken: token } })
-    if(!user){
+    if (!user) {
         throw new InvalidTokenException();
     }
     user.inactive = false;
@@ -44,7 +44,7 @@ const activate = async token => {
 const getUsers = async (page, size) => {
     const usersWithCount = await User.findAndCountAll({
         where: { inactive: false },
-        attributes: ['id', 'username', 'email'],
+        attributes: [ 'id', 'username', 'email' ],
         limit: size,
         offset: size * page
     })
@@ -62,17 +62,25 @@ const getUser = async (id) => {
             id,
             inactive: false
         },
-        attributes: ['id', 'username', 'email'],
+        attributes: [ 'id', 'username', 'email' ],
     })
-    if(!user){
+    if (!user) {
         throw new UserNotFoundException()
     }
     return user;
 }
+
+const updateUser = async (id, body) => {
+    const user = await User.findOne({ where: { id } })
+    user.username = body.username
+    await user.save()
+}
+
 module.exports = {
     save,
     findByEmail,
     activate,
     getUsers,
-    getUser
+    getUser,
+    updateUser
 }
