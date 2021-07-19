@@ -14,18 +14,19 @@ beforeEach(async () => {
     await User.destroy({ truncate: true })
 })
 
-const putUser = (id = 5, body = null, options = {}) => {
-    const agent = request(app).put('/api/1.0/users/' + id)
+const putUser = async (id = 5, body = null, options = {}) => {
+    let agent = request(app)
+    let token
+    if (options.auth) {
+        const response = await agent.post('/api/1.0/auth').send(options.auth)
+        token = response.body.token
+    }
+    agent = request(app).put('/api/1.0/users/' + id)
     if (options.language) {
         agent.set('Accept-Language', options.language)
     }
-    if (options.auth) {
-        const { email, password } = options.auth
-        // const merged = `${email}: ${password}`
-        // const base64 = Buffer.from(merged).toString('base64')
-        // agent.set('Authorization', `Basic ${base64}`)
-        // the library does above for us
-        agent.auth(email, password)
+    if(token){
+        agent.set('Authorization', `Bearer ${token}`)
     }
     return agent.send(body)
 }
@@ -88,5 +89,8 @@ describe('User Update', () => {
         await putUser(savedUser.id, validUpdate, { auth: { email: savedUser.email, password: 'P4ssword' } })
         const userInDB = await User.findOne({ where: { id: savedUser.id }})
         expect(userInDB.username).toBe(validUpdate.username)
+    })
+    it('returns 403 when token is not valid', () => {
+
     })
 });

@@ -17,7 +17,6 @@ beforeEach(async () => {
 const getUsers = (options = {}) => {
     const agent = request(app).get('/api/1.0/users')
     if(options.auth){
-        console.log('here')
         const { email, password } = options.auth
         agent.auth(email, password)
     }
