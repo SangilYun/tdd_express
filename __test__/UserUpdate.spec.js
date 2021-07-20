@@ -25,8 +25,11 @@ const putUser = async (id = 5, body = null, options = {}) => {
     if (options.language) {
         agent.set('Accept-Language', options.language)
     }
-    if(token){
-        agent.set('Authorization', `Bearer ${token}`)
+    if (token) {
+        agent.set('Authorization', `Bearer ${ token }`)
+    }
+    if(options.token){
+        agent.set('Authorization', `Bearer ${options.token}`)
     }
     return agent.send(body)
 }
@@ -87,10 +90,11 @@ describe('User Update', () => {
         const savedUser = await addUser()
         const validUpdate = { username: 'user1-updated' }
         await putUser(savedUser.id, validUpdate, { auth: { email: savedUser.email, password: 'P4ssword' } })
-        const userInDB = await User.findOne({ where: { id: savedUser.id }})
+        const userInDB = await User.findOne({ where: { id: savedUser.id } })
         expect(userInDB.username).toBe(validUpdate.username)
     })
-    it('returns 403 when token is not valid', () => {
-
+    it('returns 403 when token is not valid', async () => {
+        const response = await putUser(5, null, { token: '123' })
+        expect(response.status).toBe(403)
     })
 });
