@@ -17,7 +17,7 @@ beforeEach(async () => {
 const auth = async (options = {}) => {
     let token
     if(options.auth){
-        const response = await request(app).post('/api/1.0/auth')
+        const response = await request(app).post('/api/1.0/auth').send(options.auth);
         token = response.body.token
     }
     return token
@@ -25,7 +25,7 @@ const auth = async (options = {}) => {
 
 const getUsers = (options = {}) => {
     const agent = request(app).get('/api/1.0/users')
-    if(options.auth){
+    if(options.token){
         agent.set('Authorization', `Bearer ${options.token}`)
     }
     return agent;
